@@ -8,7 +8,7 @@
     "pycryptodome",
     "numpy",
     "requests_async",
-    "pyloxone-api"
+    "pyloxone-api==0.2.0"
   ],
   "dependencies": [],
   "codeowners": ["JoDehli"],
