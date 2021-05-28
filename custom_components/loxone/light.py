@@ -47,7 +47,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     generate_subcontrols = config_entry.options.get(
         "generate_lightcontroller_subcontrols", False
     )
-    loxconfig = miniserver.lox_config.json
+    loxconfig = miniserver.api.json
     identify = loxconfig["msInfo"]["serialNr"]
     devices = []
     all_dimmers = []
