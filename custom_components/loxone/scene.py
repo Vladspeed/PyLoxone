@@ -10,7 +10,7 @@ import logging
 from homeassistant.components.scene import Scene
 from homeassistant.helpers.entity_platform import async_call_later
 
-from .const import CONF_SCENE_GEN, DEFAULT_DELAY_SCENE, DOMAIN, SENDDOMAIN
+from .const import CONF_SCENE_GEN,  DOMAIN, SENDDOMAIN, DEFAULT_DELAY_SCENE
 from .miniserver import get_miniserver_from_config
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,13 +30,17 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         for _ in entity_ids:
             state = hass.states.get(_)
             att = state.attributes
-            if "plattform" in att and att['plattform'] == DOMAIN:
-                entity = hass.data['light'].get_entity(state.entity_id)
+            if "plattform" in att and att["plattform"] == DOMAIN:
+                entity = hass.data["light"].get_entity(state.entity_id)
                 if entity.device_class == "LightControllerV2":
                     for effect in entity.effect_list:
                         mood_id = entity.get_id_by_moodname(effect)
                         uuid = entity.uuidAction
-                        devices.append(Loxonelightscene("{}-{}".format(entity.name, effect), mood_id, uuid))
+                        devices.append(
+                            Loxonelightscene(
+                                "{}-{}".format(entity.name, effect), mood_id, uuid
+                            )
+                        )
         async_add_devices(devices, True)
 
     if miniserver.config_entry.options.get(CONF_SCENE_GEN, False):
@@ -45,8 +49,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     return True
 
 
-async def async_setup_platform(hass, config, async_add_devices,
-                               discovery_info=None):
+async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     """Set up Scenes."""
     return True
 
@@ -64,4 +67,7 @@ class Loxonelightscene(Scene):
 
     def activate(self):
         """Activate scene. Try to get entities into requested state."""
-        self.hass.bus.async_fire(SENDDOMAIN, dict(uuid=self.uuidAction, value="changeTo/{}".format(self.mood_id)))
+        self.hass.bus.async_fire(
+            SENDDOMAIN,
+            dict(uuid=self.uuidAction, value="changeTo/{}".format(self.mood_id)),
+        )
