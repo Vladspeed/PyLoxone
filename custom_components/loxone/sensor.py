@@ -9,15 +9,10 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_UNIT_OF_MEASUREMENT,
-    CONF_VALUE_TEMPLATE,
-    STATE_OFF,
-    STATE_ON,
-    STATE_UNKNOWN,
-    CONF_DEVICE_CLASS,
-)
+from homeassistant.components.sensor import SensorEntity
+from homeassistant.const import (CONF_NAME, CONF_UNIT_OF_MEASUREMENT,
+                                 CONF_VALUE_TEMPLATE, STATE_OFF, STATE_ON,
+                                 STATE_UNKNOWN, CONF_DEVICE_CLASS)
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
@@ -119,7 +114,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     # return True
 
 
-class LoxoneCustomSensor(LoxoneEntity):
+class LoxoneCustomSensor(LoxoneEntity, SensorEntity):
     def __init__(self, **kwargs):
         self._name = kwargs["name"]
         if "uuidAction" in kwargs:
@@ -162,7 +157,7 @@ class LoxoneCustomSensor(LoxoneEntity):
         return self._state
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement of this entity, if any."""
         return self._unit_of_measurement
 
@@ -184,7 +179,7 @@ class LoxoneCustomSensor(LoxoneEntity):
         return self._device_class
 
 
-class LoxoneVersionSensor(LoxoneEntity):
+class LoxoneVersionSensor(LoxoneEntity, SensorEntity):
     def __init__(self, version_list):
         try:
             self.version = ".".join([str(x) for x in version_list])
@@ -201,7 +196,7 @@ class LoxoneVersionSensor(LoxoneEntity):
         return False
 
     @property
-    def state(self):
+    def native_value(self):
         return self.version
 
     @property
@@ -215,7 +210,7 @@ class LoxoneVersionSensor(LoxoneEntity):
         return "loxone_software_version"
 
 
-class LoxoneTextSensor(LoxoneEntity):
+class LoxoneTextSensor(LoxoneEntity, SensorEntity):
     """Representation of a Text Sensor."""
 
     def __init__(self, **kwargs):
@@ -233,7 +228,7 @@ class LoxoneTextSensor(LoxoneEntity):
         return self.type
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the state of the sensor."""
         return self._state
 
@@ -260,7 +255,7 @@ class LoxoneTextSensor(LoxoneEntity):
         }
 
 
-class Loxonesensor(LoxoneEntity):
+class Loxonesensor(LoxoneEntity, SensorEntity):
     """Representation of a Sensor."""
 
     def __init__(self, **kwargs):
@@ -301,7 +296,7 @@ class Loxonesensor(LoxoneEntity):
         return False
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the state of the sensor."""
         if self._format is not None and self._state != STATE_UNKNOWN:
             try:
@@ -311,8 +306,8 @@ class Loxonesensor(LoxoneEntity):
         else:
             return self._state
 
-    @state.setter
-    def state(self, value):
+    @native_value.setter
+    def native_value(self, value):
         if self._format is not None and self._state != STATE_UNKNOWN:
             try:
                 self._state = self._format % value
@@ -322,7 +317,7 @@ class Loxonesensor(LoxoneEntity):
             self._state = value
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
         return self._unit_of_measurement
 
